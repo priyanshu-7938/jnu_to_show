@@ -27,18 +27,29 @@ const userSchema=Schema({
         required:true
     }
 })
-adminSchema.pre("save",async function(next){
+userSchema.pre("save",async function(next){
     if(!this.isModified("password")) return next();
 
     this.password=await bcrypt.hash(this.password,10);
     next();
 
-}) 
+}); 
 
-adminSchema.methods.isPasswordCorrect=async function (password){
+userSchema.methods.isPasswordCorrect=async function (password){
     return await bcrypt.compare(password,this.password);
 }
-adminSchema.methods.generateAccessToken=function(){
+userSchema.pre("save",async function(next){
+    if(!this.isModified("face_id")) return next();
+
+    this.face_id=await bcrypt.hash(this.face_id,10);
+    next();
+
+}) 
+
+userSchema.methods.isFaceIdCorrect=async function(face_id){
+    return await bcrypt.compare(face_id,this.face_id);
+}
+userSchema.methods.generateAccessToken=function(){
     return jwt.sign(
         {
             _id: this._id,
