@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const connectDB=async ()=>{
     try {
-        const connectionInstance=await mongoose.connect(`mongodb://127.0.0.1:27017/JNU_TEST_PROJECT`);
-        console.log(`\nMONGODB connected !! DB NAME: ${connectionInstance.connection.host}`);
+        const connectionInstance=await mongoose.connect(`${process.env.MONGODB_URI}/JNU_HACKATHON`);
+        console.log(`\nMONGODB connected !! DB NAME: ${connectionInstance.connection}`);
     } 
     catch (error) {
         console.log("MONGODB error occured: ",error);
