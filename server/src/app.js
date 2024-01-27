@@ -14,4 +14,9 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+import UserRouter from '../src/controllers/blind/user.controller';
+import { verifyJWT } from "./middlewares/auth.middleware";
+
+app.use('/blind',verifyJWT,UserRouter);
+
 export {app};
