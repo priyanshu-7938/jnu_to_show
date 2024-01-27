@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 
 export default function HomeWelcome () {
-    // const Navigate =  useNavigate();
-    const Navigate = (msg)=>{alert(msg);};
+    const Navigate =  useNavigate();
     return (
         <>
             <Navbar/>
@@ -118,21 +117,21 @@ export default function HomeWelcome () {
                             <div className="w-[3px] rounded bg-black"></div>
                             <div className="flex gap-1 flex-col">
                                 <p className="text-7xl">10,211</p>
-                                <p className="text-sm">Students Involved</p>
+                                <p calssName="text-sm">Students Involved</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-[3px] rounded bg-black"></div>
                             <div className="flex gap-1 flex-col">
                                 <p className="text-7xl">27</p>
-                                <p className="text-sm">NGO's Affiliated</p>
+                                <p calssName="text-sm">NGO's Affiliated</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
                             <div className="w-[3px] rounded bg-black"></div>
                             <div className="flex gap-1 flex-col">
                                 <p className="text-7xl">1,091</p>
-                                <p className="text-sm">Mentors Connected</p>
+                                <p calssName="text-sm">Mentors Connected</p>
                             </div>
                         </div>
                     </div>
