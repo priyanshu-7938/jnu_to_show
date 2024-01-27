@@ -25,7 +25,26 @@ const userSchema=Schema({
     face_id:{
         type:String,
         required:true
-    }
+    },
+    modules:[{
+        module:{
+            type:Schema.Types.ObjectId,
+            ref:'Module'
+        },
+        status:{
+            type:String,
+            enum:['pending','completed'],
+            default:'pending'
+        },
+        total:{
+            type:Number,
+            required:true
+        },
+        progress:{
+            type:Number,
+            default:1
+        },
+    }]
 })
 userSchema.pre("save",async function(next){
     if(!this.isModified("password")) return next();

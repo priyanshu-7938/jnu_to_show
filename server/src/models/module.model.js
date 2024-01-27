@@ -10,17 +10,21 @@ const moduleSchema=Schema({
         type:String,
         required:true
     },
-    tag:{
+    tags:[{
         type:String,
-        enum:['cultural','singing'],
         required:true,
         index:true
-    },
+    }],
     course_description:{
         type:String
     },
     thumbnail:{
-        type:String
+        type:String,
+        default:'https://imageio.forbes.com/specials-images/imageserve/5f85be4ed0acaafe77436710/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds'
+    },
+    total_videos:{
+        type:Number,
+        required:true
     },
     videos:[{
         index:{
@@ -37,11 +41,7 @@ const moduleSchema=Schema({
         videolink:{
             type:String,
         },
-        status:{
-            type:String,
-            enum:['pending','completed'],
-            default:'pending'
-        }
+        
     }]
     
 })

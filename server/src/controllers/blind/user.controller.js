@@ -141,8 +141,64 @@ const updateProfile=async(req,res,next)=>{
 const showModules=async(req,res,next)=>{
     try{
         const  modules = await Module.find({for:'blind'});
+        res.status(200).json(new ApiResponse(200,modules,"Succesfully retrieved"));
         
+    }catch(error) {
+        next(error);
+    }
+}
+
+const showModulesbytag=async(req,res,next)=>{
+    try{
+        const {tags}=req.body;
+        const modules=await Module.aggregate(
+            {
+                "$match":{"for":'blind'}
+            },
+            {
+                "$match": {"tags":{"$in": tags}},
+            }
+        );
+        res.status(200).json(new ApiResponse(200,modules,"Succesfully retrieved"));
+
+    }
+    catch{
+        next(error);
+    }
+}
+
+const updateModuleDetails=async(req,res,next)=>{
+    try{
+        const {index,module_id}=req.body;
+        const module=await Module.findById(module_id);
+        if(!module) throw new ApiError(404,"No such module exists");
+        const user_id=req.user._id;
+        const userModule=await User.findById({user_id},{modules:{$elemMatch:{module:module_id}}});
+        const model=userModule.modules[0];
+        const progress=model.progress;
+        const total=model.total;
+        if(progress==total){
+            model.status='completed';
+        }
+        else{
+            model.progress=progress+1;
+        }
         
+        await userModule.save({validateBeforeSave:false});
+
+        res.status(200).json(new ApiResponse(200,{module_id,userModule},"updated succesfully"));
+
+    }catch(error) {
+        next(error);
+    }
+}
+const getVideofromModule=async(req,res,next)=>{
+    try{
+        const {module_id,current_video}=req.body;
+        const videos=await Module.findById(module_id);
+        res.status(200).json(new ApiResponse(200,videos,"Videos retrieved succesfully"));
+
+
     }catch(error) {
         next(error);
     }
@@ -152,66 +208,4 @@ const showModules=async(req,res,next)=>{
 
 
 
-
-
-const registerUser=asyncHandler(async(req,res)=>{
-    
-    const {username,fullName,email,password}=req.body;
-    if(
-        [fullName,email,username,password].some((field)=>field?.trim()==="")
-    ){
-        throw new ApiError(400,"All fields are required",);
-    }
-    const existedUser=await User.findOne({
-        $or:[{username},{email}],
-    })
-    if(existedUser){
-        throw new ApiError(409,"User with email or username already exists");
-    }
-
-    //from multer functionality
-    const avatarLocalPath=req.files?.avatar[0]?.path;
-    // const coverImageLocalPath=req.files?.coverImage[0]?.path;
-    let coverImageLocalPath;
-    if(req.files&&Array.isArray(req.files.coverImage)&&req.files.coverImage.length>0){
-        coverImageLocalPath=req.files.coverImage[0]?.path;
-    }
-
-
-    if(!avatarLocalPath){
-        throw new ApiError(400,"Avatar file is required");
-    }
-
-    const avatar=await uploadOnCloudinary(avatarLocalPath);
-    const coverImage=await uploadOnCloudinary(coverImageLocalPath);
-
-    if(!avatar){
-        throw new ApiError(400,"Avatar file is required");
-    }
-
-    const user= await User.create({
-        fullName,
-        avatar:avatar.url,
-        coverImage:coverImage?.url||"",
-        email,
-        password,
-        username:username.toLowerCase()
-    });
-
-    const createdUser=await User.findById(user._id).select(
-        "-password -refreshToken"
-    ); //it excludes the terms in createdUser
-
-    if(!createdUser){
-        throw new ApiError(500,"Something went wrong while registering the user");
-    }
-
-
-    res.status(201).json(
-        new ApiResponse(200,createdUser,"User registered succesfully")
-    )
-})
-
-
-
-export {Signup,Login,updateProfile,showModules};
+export {Signup,Login,updateProfile,showModules,showModulesbytag,updateModuleDetails,getVideofromModule};
