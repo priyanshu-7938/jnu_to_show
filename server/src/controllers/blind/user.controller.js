@@ -1,6 +1,5 @@
 import { Module } from '../../models/module.model.js';
 import {User} from '../../models/user.model.js';
-import { uploadOnCloudinary } from '../../utils/cloudinary';
 import { ApiError } from '../../utils/ApiError.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 
@@ -24,13 +23,13 @@ const Signup=async(req,res,next)=>{
             age:age||"",
             disability:disablity,
         });
-        const createdUser=User.find(user._id).select(
+        const createdUser=await User.find(user._id).select(
             '-password -face_id'
         );
-        if(createdUser){
+        if(!createdUser){
             throw new ApiError(500,"Some error occured please try signing again");
         }
-        res.status(201).json(ApiResponse(201,createdUser,"User registered succesfully"));    
+        res.status(201).json( new ApiResponse(201,createdUser,"User registered succesfully"));    
     }catch(error){
         next(error);
     }
@@ -40,10 +39,10 @@ const Signup=async(req,res,next)=>{
 const Login=async(req,res,next)=>{
     try{
         const {email,password,face_id}=req.body;
-        if(!(email&&password)||!face_id){
+        if(!(email&&password)&&!face_id){
             throw new ApiError(400,"email password or face_id is required");
         }
-        const user=User.findOne(email);
+        const user=await User.findOne({email});;
         if(!user){
             throw new ApiError(404,"User does not exist");
         }
@@ -55,7 +54,7 @@ const Login=async(req,res,next)=>{
         else{
             isFaceIdCorrect=await user.isFaceIdCorrect(face_id);
         }
-        if(!isPasswordCorrect||!isFaceIdCorrect){
+        if(!isPasswordCorrect&&!isFaceIdCorrect){
             throw new ApiError(401,"Invalid User credentials");
         }
         const loggedInUser=await User.findById(user._id).select("-password -face_id");
